@@ -9,6 +9,12 @@ public class Payment
     public async Task ProcessPayment([ActivityTrigger] Order order, FunctionContext context)
     {
         context.GetLogger(nameof(ProcessPayment)).LogInformation($"++++++Processing payment for Order {order.OrderId}");
+
+        if (order.ExceptionFor == SimulatedExceptionFor.Payment)
+        {
+            throw new Exception("Simulated exception for payment.");
+        }
+
         await Task.Delay(1000);
     }
 

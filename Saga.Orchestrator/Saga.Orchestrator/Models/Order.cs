@@ -6,4 +6,5 @@ public class Order
     public string ProductId { get; set; }
     public int Quantity { get; set; }
     public decimal Price { get; set; }
+    public SimulatedExceptionFor? ExceptionFor { get; set; } // P6e58
 }

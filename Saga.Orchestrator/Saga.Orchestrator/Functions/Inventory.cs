@@ -10,6 +10,12 @@ public class Inventory
     public async Task ReserveInventory([ActivityTrigger] Order order, FunctionContext context)
     {
         context.GetLogger(nameof(ReserveInventory)).LogInformation($"++++++Reserving inventory for Order {order.OrderId}");
+
+        if (order.ExceptionFor == SimulatedExceptionFor.Inventory)
+        {
+            throw new Exception("Simulated exception for inventory.");
+        }
+
         await Task.Delay(1000); // Simulate some processing time
     }
 

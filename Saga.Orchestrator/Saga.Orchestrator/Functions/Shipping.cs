@@ -10,6 +10,12 @@ public class Shipping
     public async Task ArrangeShipping([ActivityTrigger] Order order, FunctionContext context)
     {
         context.GetLogger("ArrangeShipping").LogInformation($"++++++Arranging shipping for Order {order.OrderId}");
+
+        if (order.ExceptionFor == SimulatedExceptionFor.Shipping)
+        {
+            throw new Exception("Simulated exception for shipping.");
+        }
+
         await Task.Delay(1000);
     }
 
