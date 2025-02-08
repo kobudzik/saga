@@ -9,12 +9,10 @@ public class Shipping
     [Function("ArrangeShipping")]
     public async Task ArrangeShipping([ActivityTrigger] Order order, FunctionContext context)
     {
-        context.GetLogger("ArrangeShipping").LogInformation($"++++++Arranging shipping for Order {order.OrderId}");
+        context.GetLogger<Shipping>().LogInformation($"++++++Arranging shipping for Order {order.OrderId}");
 
         if (order.ExceptionFor == SimulatedExceptionFor.Shipping)
-        {
             throw new Exception("Simulated exception for shipping.");
-        }
 
         await Task.Delay(1000);
     }
@@ -22,7 +20,7 @@ public class Shipping
     [Function("CompensateShipping")]
     public async Task CompensateShipping([ActivityTrigger] Order order, FunctionContext context)
     {
-        context.GetLogger("CompensateShipping").LogWarning($"-----Canceling shipping for Order {order.OrderId}");
+        context.GetLogger<Shipping>().LogWarning($"-----Canceling shipping for Order {order.OrderId}");
         await Task.Delay(1000);
     }
 }

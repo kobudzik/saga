@@ -11,25 +11,25 @@ public class OrderProcessingOrchestrator
     public async Task<string> Run(
         [OrchestrationTrigger] TaskOrchestrationContext context)
     {
-        var log = context.CreateReplaySafeLogger("OrderProcessingOrchestrator");
+        var log = context.CreateReplaySafeLogger<OrderProcessingOrchestrator>();
         var order = context.GetInput<Order>();
 
         var sagaSteps = new List<SagaStep>
         {
             new() {
-                Name = "ReserveInventory",
-                Action = async ctx => await ctx.CallActivityAsync("ReserveInventory", order),
-                Compensation = async ctx => await ctx.CallActivityAsync("CompensateInventory", order)
+                Name = nameof(Inventory.ReserveInventory),
+                Action = async ctx => await ctx.CallActivityAsync(nameof(Inventory.ReserveInventory), order),
+                Compensation = async ctx => await ctx.CallActivityAsync(nameof(Inventory.CompensateInventory), order)
             },
             new() {
-                Name = "ProcessPayment",
-                Action = async ctx => await ctx.CallActivityAsync("ProcessPayment", order),
-                Compensation = async ctx => await ctx.CallActivityAsync("CompensatePayment", order)
+                Name = nameof(Payment.CompensatePayment),
+                Action = async ctx => await ctx.CallActivityAsync(nameof(Payment.ProcessPayment), order),
+                Compensation = async ctx => await ctx.CallActivityAsync(nameof(Payment.CompensatePayment), order)
             },
             new() {
-                Name = "ArrangeShipping",
-                Action = async ctx => await ctx.CallActivityAsync("ArrangeShipping", order),
-                Compensation = async ctx => await ctx.CallActivityAsync("CompensateShipping", order)
+                Name = nameof(Shipping.ArrangeShipping),
+                Action = async ctx => await ctx.CallActivityAsync(nameof(Shipping.ArrangeShipping), order),
+                Compensation = async ctx => await ctx.CallActivityAsync(nameof(Shipping.CompensateShipping), order)
             }
         };
 

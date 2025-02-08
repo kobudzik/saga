@@ -2,9 +2,11 @@
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.DurableTask.Client;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Saga.Orchestrator.Models;
 using System.Net;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace Saga.Orchestrator.Functions;
 
@@ -16,12 +18,14 @@ public class StartOrderProcessing
         [DurableClient] DurableTaskClient starter,
         FunctionContext executionContext)
     {
-        var logger = executionContext.GetLogger("StartOrderProcessing");
-
-        var order = await JsonSerializer.DeserializeAsync<Order>(req.Body, new JsonSerializerOptions
+        var logger = executionContext.GetLogger<StartOrderProcessing>();
+        var serializerOptions = new JsonSerializerOptions
         {
-            PropertyNameCaseInsensitive = true
-        });
+            PropertyNameCaseInsensitive = true,
+        };
+
+        serializerOptions.Converters.Add(new JsonStringEnumConverter());
+        var order = await JsonSerializer.DeserializeAsync<Order>(req.Body, serializerOptions);
 
         if (order == null)
         {

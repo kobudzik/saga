@@ -8,12 +8,10 @@ public class Payment
     [Function("ProcessPayment")]
     public async Task ProcessPayment([ActivityTrigger] Order order, FunctionContext context)
     {
-        context.GetLogger(nameof(ProcessPayment)).LogInformation($"++++++Processing payment for Order {order.OrderId}");
+        context.GetLogger<Payment>().LogInformation($"++++++Processing payment for Order {order.OrderId}");
 
         if (order.ExceptionFor == SimulatedExceptionFor.Payment)
-        {
             throw new Exception("Simulated exception for payment.");
-        }
 
         await Task.Delay(1000);
     }
@@ -21,7 +19,7 @@ public class Payment
     [Function("CompensatePayment")]
     public async Task CompensatePayment([ActivityTrigger] Order order, FunctionContext context)
     {
-        context.GetLogger(nameof(CompensatePayment)).LogWarning($"-----Refunding payment for Order {order.OrderId}");
+        context.GetLogger<Payment>().LogWarning($"-----Refunding payment for Order {order.OrderId}");
         await Task.Delay(1000);
     }
 }

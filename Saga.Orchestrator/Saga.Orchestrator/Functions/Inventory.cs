@@ -9,20 +9,20 @@ public class Inventory
     [Function("ReserveInventory")]
     public async Task ReserveInventory([ActivityTrigger] Order order, FunctionContext context)
     {
-        context.GetLogger(nameof(ReserveInventory)).LogInformation($"++++++Reserving inventory for Order {order.OrderId}");
+        var logger = context.GetLogger<Inventory>();
+        logger.LogInformation("++++++Reserving inventory for Order {OrderId}", order.OrderId);
 
         if (order.ExceptionFor == SimulatedExceptionFor.Inventory)
-        {
             throw new Exception("Simulated exception for inventory.");
-        }
 
-        await Task.Delay(1000); // Simulate some processing time
+        await Task.Delay(1000);
     }
 
     [Function("CompensateInventory")]
     public async Task CompensateInventory([ActivityTrigger] Order order, FunctionContext context)
     {
-        context.GetLogger(nameof(CompensateInventory)).LogWarning($"-----Compensating inventory for Order {order.OrderId}");
+        var logger = context.GetLogger<Inventory>();
+        logger.LogWarning("-----Compensating inventory for Order {OrderId}", order.OrderId);
         await Task.Delay(1000);
     }
 }
