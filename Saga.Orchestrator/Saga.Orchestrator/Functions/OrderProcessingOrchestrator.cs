@@ -45,7 +45,7 @@ public class OrderProcessingOrchestrator
         }
         catch (Exception ex)
         {
-            log.LogError($"Saga failed: {ex.Message}. Starting compensations.");
+            log.LogError(ex, "Saga failed. Starting compensations.");
             foreach (var step in sagaSteps.Where(s => s.IsCompleted))
             {
                 await step.Compensation(context);

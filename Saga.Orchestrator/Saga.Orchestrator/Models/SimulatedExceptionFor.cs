@@ -1,9 +1,8 @@
-namespace Saga.Orchestrator.Models
+namespace Saga.Orchestrator.Models;
+
+public enum SimulatedExceptionFor
 {
-    public enum SimulatedExceptionFor
-    {
-        Payment,
-        Shipping,
-        Inventory
-    }
+    Payment,
+    Shipping,
+    Inventory
 }
