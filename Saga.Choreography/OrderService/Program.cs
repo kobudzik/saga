@@ -1,19 +1,45 @@
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Hosting;
+using MassTransit;
+using MessageContracts;
+using Microsoft.AspNetCore.Builder;
+using OrderService.Consumers;
 
-namespace OrderService;
+var builder = WebApplication.CreateBuilder(args);
 
-public class Program
+builder.Services.AddMassTransit(config =>
 {
-    public static void Main(string[] args)
-    {
-        CreateHostBuilder(args).Build().Run();
-    }
+    config.AddConsumer<CreateOrderCommandConsumer>();
+    config.AddConsumer<StockNotReservedEventConsumer>();
+    config.AddConsumer<PaymentConfirmedEventConsumer>();
+    config.AddConsumer<PaymentRejectedEventConsumer>();
 
-    public static IHostBuilder CreateHostBuilder(string[] args) =>
-        Host.CreateDefaultBuilder(args)
-            .ConfigureWebHostDefaults(webBuilder =>
-            {
-                webBuilder.UseStartup<Startup>();
-            });
-}
+    config.UsingRabbitMq((context, rabbitConfig) =>
+    {
+        rabbitConfig.Host(RabbitMQConstants.Uri);
+
+        rabbitConfig.ReceiveEndpoint(RabbitMQConstants.CreateOrderQueueName, e =>
+        {
+            e.ConfigureConsumer<CreateOrderCommandConsumer>(context);
+        });
+
+        rabbitConfig.ReceiveEndpoint(RabbitMQConstants.OrderStockNotReservedQueueName, e =>
+        {
+            e.ConfigureConsumer<StockNotReservedEventConsumer>(context);
+        });
+
+        rabbitConfig.ReceiveEndpoint(RabbitMQConstants.PaymentConfirmedQueueName, e =>
+        {
+            e.ConfigureConsumer<PaymentConfirmedEventConsumer>(context);
+        });
+
+        rabbitConfig.ReceiveEndpoint(RabbitMQConstants.OrderPaymentRejectedQueueName, e =>
+        {
+            e.ConfigureConsumer<PaymentRejectedEventConsumer>(context);
+        });
+    });
+});
+
+builder.Services.AddMassTransitHostedService();
+
+var app = builder.Build();
+
+app.Run();

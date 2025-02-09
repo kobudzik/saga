@@ -1,20 +1,26 @@
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Hosting;
+using MassTransit;
+using MessageContracts;
+using Microsoft.AspNetCore.Builder;
+using PaymentService.Consumers;
 
-namespace PaymentService
+var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddMassTransit(config =>
 {
-    public class Program
-    {
-        public static void Main(string[] args)
-        {
-            CreateHostBuilder(args).Build().Run();
-        }
+    config.AddConsumer<StockReservedEventConsumer>();
 
-        public static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args)
-                .ConfigureWebHostDefaults(webBuilder =>
-                {
-                    webBuilder.UseStartup<Startup>();
-                });
-    }
-}
+    config.UsingRabbitMq((context, rabbitConfig) =>
+    {
+        rabbitConfig.Host(RabbitMQConstants.Uri);
+
+        rabbitConfig.ReceiveEndpoint(RabbitMQConstants.PaymentStockReservedQueue, e =>
+        {
+            e.ConfigureConsumer<StockReservedEventConsumer>(context);
+        });
+    });
+});
+builder.Services.AddMassTransitHostedService();
+
+var app = builder.Build();
+
+app.Run();

@@ -1,19 +1,32 @@
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Hosting;
+using MassTransit;
+using MessageContracts;
+using Microsoft.AspNetCore.Builder;
+using StockService.Consumers;
 
-namespace StockService;
+var builder = WebApplication.CreateBuilder(args);
 
-public class Program
+builder.Services.AddMassTransit(config =>
 {
-    public static void Main(string[] args)
-    {
-        CreateHostBuilder(args).Build().Run();
-    }
+    config.AddConsumer<OrderCreatedEventConsumer>();
+    config.AddConsumer<PaymentRejectedEventConsumer>();
 
-    public static IHostBuilder CreateHostBuilder(string[] args) =>
-        Host.CreateDefaultBuilder(args)
-            .ConfigureWebHostDefaults(webBuilder =>
-            {
-                webBuilder.UseStartup<Startup>();
-            });
-}
+    config.UsingRabbitMq((context, rabbitConfig) =>
+    {
+        rabbitConfig.Host(RabbitMQConstants.Uri);
+
+        rabbitConfig.ReceiveEndpoint(RabbitMQConstants.StockOrderCreatedQueueName, e =>
+        {
+            e.ConfigureConsumer<OrderCreatedEventConsumer>(context);
+        });
+
+        rabbitConfig.ReceiveEndpoint(RabbitMQConstants.StockPaymentRejectedQueueName, e =>
+        {
+            e.ConfigureConsumer<PaymentRejectedEventConsumer>(context);
+        });
+    });
+});
+builder.Services.AddMassTransitHostedService();
+
+var app = builder.Build();
+
+app.Run();

@@ -4,29 +4,28 @@ using MassTransit;
 using MessageContracts.Commands;
 using MessageContracts.Events;
 
-namespace OrderService.Consumers
+namespace OrderService.Consumers;
+
+public class CreateOrderCommandConsumer(IPublishEndpoint publishEndpoint) : IConsumer<ICreateOrderCommand>
 {
-    public class CreateOrderCommandConsumer(IPublishEndpoint publishEndpoint) : IConsumer<ICreateOrderCommand>
+    public async Task Consume(ConsumeContext<ICreateOrderCommand> context)
     {
-        public async Task Consume(ConsumeContext<ICreateOrderCommand> context)
+        var message = context.Message;
+
+        // Some validation ...
+
+        // Create order with Pending status
+
+        await publishEndpoint.Publish<IOrderCreatedEvent>(new
         {
-            var message = context.Message;
-
-            // Some validation ...
-
-            // Create order with Pending status
-
-            await publishEndpoint.Publish<IOrderCreatedEvent>(new
+            UserId = message.UserId,
+            OrderId = 1,
+            Items = message.Items.Select(s => new
             {
-                UserId = message.UserId,
-                OrderId = 1,
-                Items = message.Items.Select(s => new
-                {
-                    Id = s.ProductId,
-                    Quantity = s.Quantity
-                }),
-                TotalAmount = message.Items.Sum(s => s.Quantity * s.Price)
-            });
-        }
+                Id = s.ProductId,
+                Quantity = s.Quantity
+            }),
+            TotalAmount = message.Items.Sum(s => s.Quantity * s.Price)
+        });
     }
 }

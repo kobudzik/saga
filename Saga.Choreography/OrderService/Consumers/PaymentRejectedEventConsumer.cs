@@ -2,14 +2,13 @@ using System.Threading.Tasks;
 using MassTransit;
 using MessageContracts.Events;
 
-namespace OrderService.Consumers
+namespace OrderService.Consumers;
+
+public class PaymentRejectedEventConsumer : IConsumer<IPaymentRejectedEvent>
 {
-    public class PaymentRejectedEventConsumer : IConsumer<IPaymentRejectedEvent>
+    public Task Consume(ConsumeContext<IPaymentRejectedEvent> context)
     {
-        public Task Consume(ConsumeContext<IPaymentRejectedEvent> context)
-        {
-            // Update order status from Pending to Rejected via {context.Message.OrderId}
-            return Task.CompletedTask;
-        }
+        // Update order status from Pending to Rejected via {context.Message.OrderId}
+        return Task.CompletedTask;
     }
 }
