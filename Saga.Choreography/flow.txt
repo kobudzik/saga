@@ -1,0 +1,25 @@
+Order.API
+	OrderController CreateOrderRequest
+	ICreateOrderCommand order.create
+	
+	
+OrderService
+	CreateOrderCommandConsumer
+	publish IOrderCreatedEvent
+	
+StockService 
+	OrderCreatedConsumer
+	publish IStockReservedEvent/ IStockNotReservedEvent
+	
+	
+OrderService
+	StockNotReservedEventConsumer
+PaymentService
+	StockReservedEventConsumer
+	publish IPaymentConfirmedEvent / IPaymentRejectedEvent
+	
+	
+	
+OrderService
+	PaymentRejectedEventConsumer
+	PaymentConfirmedEventConsumer
