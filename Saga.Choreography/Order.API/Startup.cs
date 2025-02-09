@@ -2,61 +2,52 @@ using MassTransit;
 using MessageContracts;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 
-namespace Order.API
+namespace Order.API;
+
+public class Startup()
 {
-    public class Startup
+    public void ConfigureServices(IServiceCollection services)
     {
-        public Startup(IConfiguration configuration)
+
+        services.AddControllers();
+        services.AddSwaggerGen(c =>
         {
-            Configuration = configuration;
+            c.SwaggerDoc("v1", new OpenApiInfo { Title = "Order.API", Version = "v1" });
+        });
+
+        services.AddMassTransit(configuration =>
+        {
+            configuration.UsingRabbitMq((context, config) =>
+            {
+                config.Host(RabbitMQConstants.Uri);
+            });
+        });
+
+        services.AddMassTransitHostedService();
+    }
+
+    public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+    {
+        if (env.IsDevelopment())
+        {
+            app.UseDeveloperExceptionPage();
+            app.UseSwagger();
+            app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Order.API v1"));
         }
 
-        public IConfiguration Configuration { get; }
+        app.UseHttpsRedirection();
 
-        public void ConfigureServices(IServiceCollection services)
+        app.UseRouting();
+
+        app.UseAuthorization();
+
+        app.UseEndpoints(endpoints =>
         {
-
-            services.AddControllers();
-            services.AddSwaggerGen(c =>
-            {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Order.API", Version = "v1" });
-            });
-
-            services.AddMassTransit(configuration =>
-            {
-                configuration.UsingRabbitMq((context, config) =>
-                {
-                    config.Host(RabbitMQConstants.Uri);
-                });
-            });
-
-            services.AddMassTransitHostedService();
-        }
-
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
-        {
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-                app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Order.API v1"));
-            }
-
-            app.UseHttpsRedirection();
-
-            app.UseRouting();
-
-            app.UseAuthorization();
-
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapControllers();
-            });
-        }
+            endpoints.MapControllers();
+        });
     }
 }

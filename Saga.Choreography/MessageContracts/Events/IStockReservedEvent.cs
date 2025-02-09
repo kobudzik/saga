@@ -1,12 +1,11 @@
 using System.Collections.Generic;
 
-namespace MessageContracts.Events
+namespace MessageContracts.Events;
+
+public interface IStockReservedEvent
 {
-    public interface IStockReservedEvent
-    {
-        int UserId { get; }
-        int OrderId { get; }
-        decimal TotalAmount { get; }
-        List<IOrderItem> Items { get; }
-    }
+    int UserId { get; }
+    int OrderId { get; }
+    decimal TotalAmount { get; }
+    List<IOrderItem> Items { get; }
 }

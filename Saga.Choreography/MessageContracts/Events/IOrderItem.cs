@@ -1,8 +1,7 @@
-namespace MessageContracts.Events
+namespace MessageContracts.Events;
+
+public interface IOrderItem
 {
-    public interface IOrderItem
-    {
-        int Id { get; }
-        int Quantity { get; }
-    }
+    int Id { get; }
+    int Quantity { get; }
 }

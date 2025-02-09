@@ -1,7 +1,6 @@
-namespace MessageContracts.Events
+namespace MessageContracts.Events;
+
+public interface IPaymentConfirmedEvent
 {
-    public interface IPaymentConfirmedEvent
-    {
-        int OrderId { get; }
-    }
+    int OrderId { get; }
 }

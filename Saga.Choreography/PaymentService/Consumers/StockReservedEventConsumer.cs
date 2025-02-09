@@ -4,15 +4,8 @@ using MessageContracts.Events;
 
 namespace PaymentService.Consumers
 {
-    public class StockReservedEventConsumer : IConsumer<IStockReservedEvent>
+    public class StockReservedEventConsumer(IPublishEndpoint publishEndpoint) : IConsumer<IStockReservedEvent>
     {
-        private readonly IPublishEndpoint _publishEndpoint;
-
-        public StockReservedEventConsumer(IPublishEndpoint publishEndpoint)
-        {
-            _publishEndpoint = publishEndpoint;
-        }
-
         public async Task Consume(ConsumeContext<IStockReservedEvent> context)
         {
             var message = context.Message;
@@ -21,14 +14,14 @@ namespace PaymentService.Consumers
 
             if (paymentResult)
             {
-                await _publishEndpoint.Publish<IPaymentConfirmedEvent>(new
+                await publishEndpoint.Publish<IPaymentConfirmedEvent>(new
                 {
                     OrderId = message.OrderId
                 });
             }
             else
             {
-                await _publishEndpoint.Publish<IPaymentRejectedEvent>(new
+                await publishEndpoint.Publish<IPaymentRejectedEvent>(new
                 {
                     UserId = message.UserId,
                     OrderId = message.OrderId,

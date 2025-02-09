@@ -4,15 +4,8 @@ using MessageContracts.Events;
 
 namespace StockService.Consumers
 {
-    public class OrderCreatedEventConsumer : IConsumer<IOrderCreatedEvent>
+    public class OrderCreatedEventConsumer(IPublishEndpoint publishEndpoint) : IConsumer<IOrderCreatedEvent>
     {
-        private readonly IPublishEndpoint _publishEndpoint;
-
-        public OrderCreatedEventConsumer(IPublishEndpoint publishEndpoint)
-        {
-            _publishEndpoint = publishEndpoint;
-        }
-
         public async Task Consume(ConsumeContext<IOrderCreatedEvent> context)
         {
             var message = context.Message;
@@ -21,7 +14,7 @@ namespace StockService.Consumers
 
             if (stockResult)
             {
-                await _publishEndpoint.Publish<IStockReservedEvent>(new
+                await publishEndpoint.Publish<IStockReservedEvent>(new
                 {
                     UserId = message.UserId,
                     OrderId = message.OrderId,
@@ -31,7 +24,7 @@ namespace StockService.Consumers
             }
             else
             {
-                await _publishEndpoint.Publish<IStockNotReservedEvent>(new
+                await publishEndpoint.Publish<IStockNotReservedEvent>(new
                 {
                     OrderId = message.OrderId,
                     Message = "Insufficient Stock"

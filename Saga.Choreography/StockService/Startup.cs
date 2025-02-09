@@ -5,35 +5,34 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using StockService.Consumers;
 
-namespace StockService
+namespace StockService;
+
+public class Startup
 {
-    public class Startup
+    public void ConfigureServices(IServiceCollection services)
     {
-        public void ConfigureServices(IServiceCollection services)
+        services.AddMassTransit(configuration =>
         {
-            services.AddMassTransit(configuration =>
+            configuration.AddConsumer<OrderCreatedEventConsumer>();
+            configuration.AddConsumer<PaymentRejectedEventConsumer>();
+
+            configuration.UsingRabbitMq((context, config) =>
             {
-                configuration.AddConsumer<OrderCreatedEventConsumer>();
-                configuration.AddConsumer<PaymentRejectedEventConsumer>();
+                config.Host(RabbitMQConstants.Uri);
 
-                configuration.UsingRabbitMq((context, config) =>
+                config.ReceiveEndpoint(RabbitMQConstants.StockOrderCreatedQueueName, e =>
                 {
-                    config.Host(RabbitMQConstants.Uri);
+                    e.Consumer<OrderCreatedEventConsumer>(context);
+                });
 
-                    config.ReceiveEndpoint(RabbitMQConstants.StockOrderCreatedQueueName, e =>
-                    {
-                        e.Consumer<OrderCreatedEventConsumer>(context);
-                    });
-
-                    config.ReceiveEndpoint(RabbitMQConstants.StockPaymentRejectedQueueName, e =>
-                    {
-                        e.Consumer<PaymentRejectedEventConsumer>(context);
-                    });
+                config.ReceiveEndpoint(RabbitMQConstants.StockPaymentRejectedQueueName, e =>
+                {
+                    e.Consumer<PaymentRejectedEventConsumer>(context);
                 });
             });
-            services.AddMassTransitHostedService();
-        }
-
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env) { }
+        });
+        services.AddMassTransitHostedService();
     }
+
+    public void Configure(IApplicationBuilder app, IWebHostEnvironment env) { }
 }

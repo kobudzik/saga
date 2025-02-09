@@ -10,19 +10,12 @@ namespace Order.API.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class OrderController : ControllerBase
+    public class OrderController(ISendEndpointProvider sendEndpointProvider) : ControllerBase
     {
-        private readonly ISendEndpointProvider _sendEndpointProvider;
-
-        public OrderController(ISendEndpointProvider sendEndpointProvider)
-        {
-            _sendEndpointProvider = sendEndpointProvider;
-        }
-
         [HttpPost]
         public async Task<IActionResult> Post(CreateOrderRequest createOrderRequest)
         {
-            var sendEndpoint = await _sendEndpointProvider.GetSendEndpoint(new Uri($"queue:{RabbitMQConstants.CreateOrderQueueName}"));
+            var sendEndpoint = await sendEndpointProvider.GetSendEndpoint(new Uri($"queue:{RabbitMQConstants.CreateOrderQueueName}"));
             await sendEndpoint.Send<ICreateOrderCommand>(new
             {
                 UserId = createOrderRequest.UserId,

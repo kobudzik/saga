@@ -1,8 +1,7 @@
-namespace MessageContracts.Events
+namespace MessageContracts.Events;
+
+public interface IStockNotReservedEvent
 {
-    public interface IStockNotReservedEvent
-    {
-        int OrderId { get; }
-        string Message { get; }
-    }
+    int OrderId { get; }
+    string Message { get; }
 }

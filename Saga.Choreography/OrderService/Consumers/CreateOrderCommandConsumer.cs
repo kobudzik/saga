@@ -6,15 +6,8 @@ using MessageContracts.Events;
 
 namespace OrderService.Consumers
 {
-    public class CreateOrderCommandConsumer : IConsumer<ICreateOrderCommand>
+    public class CreateOrderCommandConsumer(IPublishEndpoint publishEndpoint) : IConsumer<ICreateOrderCommand>
     {
-        private readonly IPublishEndpoint _publishEndpoint;
-
-        public CreateOrderCommandConsumer(IPublishEndpoint publishEndpoint)
-        {
-            _publishEndpoint = publishEndpoint;
-        }
-
         public async Task Consume(ConsumeContext<ICreateOrderCommand> context)
         {
             var message = context.Message;
@@ -23,7 +16,7 @@ namespace OrderService.Consumers
 
             // Create order with Pending status
 
-            await _publishEndpoint.Publish<IOrderCreatedEvent>(new
+            await publishEndpoint.Publish<IOrderCreatedEvent>(new
             {
                 UserId = message.UserId,
                 OrderId = 1,
