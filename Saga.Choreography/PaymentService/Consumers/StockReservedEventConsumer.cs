@@ -10,7 +10,7 @@ public class StockReservedEventConsumer(IPublishEndpoint publishEndpoint) : ICon
     {
         var message = context.Message;
 
-        var paymentResult = false; //HandlePayment
+        var paymentResult = true; //HandlePayment
 
         if (paymentResult)
         {
