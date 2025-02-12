@@ -6,6 +6,7 @@ public interface ICreateOrderCommand
 {
     int UserId { get; }
     List<IOrderItem> Items { get; }
+    EventType FailOn { get; }
 }
 
 public interface IOrderItem

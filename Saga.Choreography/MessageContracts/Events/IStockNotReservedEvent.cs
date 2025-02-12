@@ -4,4 +4,5 @@ public interface IStockNotReservedEvent
 {
     int OrderId { get; }
     string Message { get; }
+    EventType FailOn { get; }
 }

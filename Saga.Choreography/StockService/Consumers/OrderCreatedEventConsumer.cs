@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using MassTransit;
+using MessageContracts;
 using MessageContracts.Events;
 
 namespace StockService.Consumers;
@@ -9,6 +10,9 @@ public class OrderCreatedEventConsumer(IPublishEndpoint publishEndpoint) : ICons
     public async Task Consume(ConsumeContext<IOrderCreatedEvent> context)
     {
         var message = context.Message;
+
+        if (message.FailOn == EventType.OrderCreated)
+            throw new System.Exception("Simulated failure on OrderCreated event.");
 
         var stockResult = true;
 
@@ -27,7 +31,8 @@ public class OrderCreatedEventConsumer(IPublishEndpoint publishEndpoint) : ICons
             await publishEndpoint.Publish<IStockNotReservedEvent>(new
             {
                 OrderId = message.OrderId,
-                Message = "Insufficient Stock"
+                Message = "Insufficient Stock",
+                FailOn = message.FailOn
             });
         }
     }

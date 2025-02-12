@@ -19,7 +19,8 @@ public class OrderController(ISendEndpointProvider sendEndpointProvider) : Contr
         await sendEndpoint.Send<ICreateOrderCommand>(new
         {
             UserId = createOrderRequest.UserId,
-            Items = createOrderRequest.Items
+            Items = createOrderRequest.Items,
+            FailOn = createOrderRequest.FailOn
         });
 
         return Accepted();

@@ -8,4 +8,5 @@ public interface IPaymentRejectedEvent
     int OrderId { get; }
     List<IOrderItem> Items { get; }
     string Message { get; }
+    EventType FailOn { get; }
 }

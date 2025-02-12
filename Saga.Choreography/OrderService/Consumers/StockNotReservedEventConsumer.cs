@@ -1,7 +1,7 @@
 using System.Threading.Tasks;
 using MassTransit;
+using MessageContracts;
 using MessageContracts.Events;
-using Order.API.Models;
 
 namespace OrderService.Consumers;
 
@@ -12,9 +12,7 @@ public class StockNotReservedEventConsumer : IConsumer<IStockNotReservedEvent>
         var message = context.Message;
 
         if (message.FailOn == EventType.StockNotReserved)
-        {
             throw new System.Exception("Simulated failure on StockNotReserved event.");
-        }
 
         // Update order status from Pending to Rejected via {context.Message.OrderId}
         return Task.CompletedTask;

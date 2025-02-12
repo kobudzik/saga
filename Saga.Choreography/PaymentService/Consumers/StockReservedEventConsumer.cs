@@ -1,7 +1,7 @@
 using System.Threading.Tasks;
 using MassTransit;
+using MessageContracts;
 using MessageContracts.Events;
-using Order.API.Models;
 
 namespace PaymentService.Consumers;
 
@@ -12,9 +12,7 @@ public class StockReservedEventConsumer(IPublishEndpoint publishEndpoint) : ICon
         var message = context.Message;
 
         if (message.FailOn == EventType.StockReserved)
-        {
             throw new System.Exception("Simulated failure on StockReserved event.");
-        }
 
         var paymentResult = true; //HandlePayment
 
@@ -32,7 +30,8 @@ public class StockReservedEventConsumer(IPublishEndpoint publishEndpoint) : ICon
                 UserId = message.UserId,
                 OrderId = message.OrderId,
                 Items = message.Items,
-                Message = "Payment rejected."
+                Message = "Payment rejected.",
+                FailOn = EventType.PaymentRejected
             });
         }
     }

@@ -8,4 +8,5 @@ public interface IStockReservedEvent
     int OrderId { get; }
     decimal TotalAmount { get; }
     List<IOrderItem> Items { get; }
+    EventType FailOn { get; }
 }
