@@ -1,6 +1,7 @@
 using System.Threading.Tasks;
 using MassTransit;
 using MessageContracts.Events;
+using Order.API.Models;
 
 namespace PaymentService.Consumers;
 
@@ -9,6 +10,11 @@ public class StockReservedEventConsumer(IPublishEndpoint publishEndpoint) : ICon
     public async Task Consume(ConsumeContext<IStockReservedEvent> context)
     {
         var message = context.Message;
+
+        if (message.FailOn == EventType.StockReserved)
+        {
+            throw new System.Exception("Simulated failure on StockReserved event.");
+        }
 
         var paymentResult = true; //HandlePayment
 

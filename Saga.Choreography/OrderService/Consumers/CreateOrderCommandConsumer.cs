@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using MassTransit;
 using MessageContracts.Commands;
 using MessageContracts.Events;
+using Order.API.Models;
 
 namespace OrderService.Consumers;
 
@@ -15,6 +16,11 @@ public class CreateOrderCommandConsumer(IPublishEndpoint publishEndpoint) : ICon
         // Some validation ...
 
         // Create order with Pending status
+
+        if (message.FailOn == EventType.OrderCreated)
+        {
+            throw new System.Exception("Simulated failure on OrderCreated event.");
+        }
 
         await publishEndpoint.Publish<IOrderCreatedEvent>(new
         {
